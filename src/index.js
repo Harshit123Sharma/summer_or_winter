@@ -1,17 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import Display from "./SeasonDisplay";
+import Load from "./Loading";
+import Err from "./Error";
+class App extends React.Component {
+  /*constructor(props) {
+    super(props);
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    this.state = { lat: null, errMsg: " " };
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  }*/
+
+  state = {lat: null, errMsg: ""};
+
+  componentDidMount() {
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => this.setState({ lat: position.coords.latitude }),
+      (err) => this.setState({ errMsg: err.message })
+    );
+  }
+
+  renderContent() {
+
+    if (this.state.lat && !this.state.errMsg) {
+      return <Display lat = {this.state.lat}/>;
+    }
+    if (this.state.errMsg && !this.state.lat) {
+      return <Err message = {this.state.errMsg} />;
+    }
+    return <Load message = "Pls allow location request..." />;
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderContent()}
+      </div>
+    );
+}
+}
+
+ReactDOM.render(<App />, document.querySelector("#root"));
